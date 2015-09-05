@@ -13,8 +13,8 @@
   "author": "Mark Anderson <P5.FEND.udacity.com@Ma7.org>",
   "license": "ISC",
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-copy": "^0.8.1",
-    "load-grunt-tasks": "^3.2.0"
+    "grunt": "~0.4.5",
+    "grunt-contrib-copy": "~0.8.1",
+    "load-grunt-tasks": "~3.2.0"
   }
 }
