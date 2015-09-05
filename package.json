@@ -1,0 +1,20 @@
+{
+  "name": "P5-1--NeighborhoodMapProject",
+  "version": "0.0.1",
+  "description": "Udacity's Front-End Web Developer Nanodegree Project 5",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github-Mark70117:Mark70117/P5-1--NeighborhoodMapProject.git"
+  },
+  "author": "Mark Anderson <P5.FEND.udacity.com@Ma7.org>",
+  "license": "ISC",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-copy": "^0.8.1",
+    "load-grunt-tasks": "^3.2.0"
+  }
+}
