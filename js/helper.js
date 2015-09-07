@@ -1,4 +1,5 @@
 var map;
+var lastStarMarker ;
 var firebase = new Firebase("https://popping-heat-1511.firebaseio.com/markers");
 var viewModel = {
     "markers": KnockoutFire.observable(
@@ -26,9 +27,23 @@ ko.bindingHandlers.map = {
         var marker = new google.maps.Marker({
             map: allBindings().map,
             position: allBindings().markerConfig.position,
+            icon: 'icons/pin-export.png',
             title: allBindings().markerConfig.title
         });
-	bindingContext.$data._mapMarker = marker;
+        var i = allBindings().markerConfig.title;
+             google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                 return function () {
+                 console.log("MRA click",i);
+                 if (lastStarMarker) {
+                     lastStarMarker.setIcon('icons/pin-export.png');
+                 }
+                 marker.setIcon('icons/star-3.png');
+	         lastStarMarker = marker;
+                 //infowindow.setContent(hk_markers[i].name);
+                 //infowindow.open(map, marker);
+            }
+        })(marker, i));
+    bindingContext.$data._mapMarker = marker;
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
         bindingContext.$data._mapMarker.setTitle(allBindings().markerConfig.title);
