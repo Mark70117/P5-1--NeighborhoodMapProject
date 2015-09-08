@@ -6,7 +6,11 @@
     <meta name="description" content="P5-1: Neighborhood Map Project">
     <meta name="author" content="Mark Anderson <P5-1.FEND.udacity.com@ma7.org>">
     <title>Project 5-1: Neighborhood Map Project</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="css/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js"></script>
     <script src='js/knockout-3.3.0.js'></script>
     <script src="https://cdn.firebase.com/v0/firebase.js"></script>
@@ -14,16 +18,22 @@
     <script src="js/helper.js"></script>
   </head>
   <body>
-    <style type="text/css">
-      html, body { height: 100%; margin: 0; padding: 0; }
-      #mapContainer { height: 100% }
-    </style>
+    <div class='container-fluid' id='listView'>
+      <div class='row'>
+        <div class="col-xs-4" id='leftList'>
+          Hello Mark!
+        </div>
+      </div> <!-- row -->
+    </div> <!-- container-fluid -->
+
     <div id='mapContainer'></div>
+
     <div id="markers">
       <div data-bind="foreach: markers">
         <div data-bind='markerConfig: markerConfig(), map: map'></div>
       </div>
     </div>
+
   </body>
 </html>
 

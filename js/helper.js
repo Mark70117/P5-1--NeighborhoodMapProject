@@ -34,11 +34,15 @@ ko.bindingHandlers.map = {
              google.maps.event.addListener(marker, 'click', (function (marker, i) {
                  return function () {
                  console.log("MRA click",i);
+                 console.log("MRA click",marker.getPosition().lat());
+                 console.log("MRA click",marker.getPosition().lng());
+                 var position = marker.getPosition();
+                 callFoursquareAPI(position.lat(), position.lng());
                  if (lastStarMarker) {
                      lastStarMarker.setIcon('icons/pin-export.png');
                  }
                  marker.setIcon('icons/star-3.png');
-	         lastStarMarker = marker;
+                 lastStarMarker = marker;
                  //infowindow.setContent(hk_markers[i].name);
                  //infowindow.open(map, marker);
             }
@@ -51,6 +55,20 @@ ko.bindingHandlers.map = {
     }
 };
 
+function callFoursquareAPI(lat,lng) {
+  url = 'https://api.foursquare.com/v2/venues/search' +
+        '?client_id=3MQGWJDDFWX1OGYLXRRTV4FQJ4RKEOXHGHSREFHGFQVYXZZZ' +
+        '&client_secret=RZ3VWUPP0WAYLZGKGA1GSZYUBLLPRDQ40YDNG4KE0COFQUVF' +
+        '&v=20130815' +
+        '&ll=' + lat + ',' + lng +
+        '&intent=checkin' +
+        '&limit=1'
+  console.log(url);
+  $.ajax({
+    url: url,
+    success: function (result) { console.log(result.response.venues[0].name); }
+  });
+}
 
 function initializeMap() {
 
