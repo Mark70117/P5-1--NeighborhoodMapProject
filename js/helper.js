@@ -76,8 +76,7 @@ function initializeAll() {
   initializeMap();
 };
 
-window.addEventListener('load', initializeAll);
-//window.addEventListener('resize', function(e) {
-//    //Make sure the map bounds get updated on page resize
-//    map.fitBounds(window.mapBounds);
-//});
+$(function() {
+  initializeAll();
+});
+
