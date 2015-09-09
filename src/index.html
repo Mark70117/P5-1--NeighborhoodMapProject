@@ -6,8 +6,7 @@
     <meta name="description" content="P5-1: Neighborhood Map Project">
     <meta name="author" content="Mark Anderson <P5-1.FEND.udacity.com@ma7.org>">
     <title>Project 5-1: Neighborhood Map Project</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+        <link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
@@ -17,23 +16,88 @@
     <script src="http://hiroshi.github.io/knockoutFire/knockoutfire-0.0.4.js"></script>
     <script src="js/helper.js"></script>
   </head>
+
   <body>
-    <div class='container-fluid' id='listView'>
-      <div class='row'>
-        <div class="col-xs-4" id='leftList'>
-          Hello Mark!
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-5 col-sm-offset-1">
+            <form class="form-horizontal">
+              <div class="form-group">
+                <div class="col-xs-10">
+                  <input class="form-control" placeholder="Website URL" required="" type="homepage">
+                </div>
+              </div>
+            </form>
+            <hr>
+            <div class="row">
+              <div class="col-md-6" id="mra0">
+                <h2>Hong Kong</h2>
+              </div>
+              <div class="col-md-6" id="mra1">
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+                Hello Mark<br>
+              </div><!--/col-6-->
+            </div><!--/row-->
+          </div><!--/col-5-->
+          <div class="col-sm-6 map">
+            <div class="google-map-canvas" id="map-canvas"></div>
+            <div id="markers">
+              <div data-bind="foreach: markers">
+                <div data-bind='markerConfig: markerConfig(), map: map'></div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div> <!-- row -->
-    </div> <!-- container-fluid -->
-
-    <div id='mapContainer'></div>
-
-    <div id="markers">
-      <div data-bind="foreach: markers">
-        <div data-bind='markerConfig: markerConfig(), map: map'></div>
       </div>
-    </div>
-
-  </body>
+    </body>
 </html>
 

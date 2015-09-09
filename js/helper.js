@@ -81,7 +81,7 @@ function initializeMap() {
   };
 
   map = new google.maps.Map(
-    document.getElementById('mapContainer'),
+    document.getElementById('map-canvas'),
     mapOptions
   );
 
