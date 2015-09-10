@@ -20,6 +20,7 @@ var viewModel = {
 
 function initializeKO() {
   ko.applyBindings(viewModel, document.getElementById("markers"));
+  ko.applyBindings(viewModel, document.getElementById("markersListView"));
 };
 
 ko.bindingHandlers.map = {

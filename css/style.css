@@ -1,18 +1,29 @@
 /* all map containers must be full height */
 html, body, .container-fluid, .row, .map { height: 100% }
 
+@media only screen {
+    #mra1,
+    #mra0 { 
+    max-height: 90vh;
+    }
+    #mra1 {
+      background-color: #ccc ;
+    }
+    #mra0 {
+      background-color: #eee ;
+    }
+}
+
 @media only screen and (max-device-width: 480px) {
     #mra1,
     #mra0 { 
-    	height: 100px;
-	background-color: red;
+    height: 100px;
     }
-}
-@media only screen and (max-device-width: 4096px) {
-    #mra1,
-    #mra0 { 
-    	max-height: 90vh;
-	background-color: gree;
+    #mra1 {
+      background-color: #cc0000 ;
+    }
+    #mra0 {
+      background-color: #ee0000 ;
     }
 }
 
