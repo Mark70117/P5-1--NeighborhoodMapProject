@@ -37,7 +37,9 @@
               <div class="col-md-6" id="mra1">
                 <div id="markersListView" >
                   <div data-bind="foreach:mapVM.markers">
-                    <div data-bind='text: markerConfig().title, visible: masterVM.filterVM.filterTextPresent(markerConfig().title)'></div>
+                    <button data-bind="click: $parent.foobar">
+                      <div data-bind='text: markerConfig().title, visible: masterVM.filterVM.filterTextPresent(markerConfig().title)'></div>
+                    </button><br/>
                   </div>
                 </div>
               </div><!--/col-6-->
@@ -47,7 +49,7 @@
             <div class="google-map-canvas" id="map-canvas"></div>
             <div id="markers">
               <div data-bind="foreach:mapVM.markers">
-                <div data-bind='markerConfig: markerConfig(), map: map'></div>
+                <div data-bind='markerConfig: markerConfig(), map: map, visible: masterVM.filterVM.filterTextPresent(markerConfig().title)'></div>
               </div>
             </div>
           </div>

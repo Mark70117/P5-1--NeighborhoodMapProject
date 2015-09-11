@@ -31,8 +31,7 @@ var MapViewModel = function() {
     self.removeMarker = function(marker) {
         firebase.child(marker.firebase.name()).remove();
     };
-
-
+    self.foobar = function() {};
 };
 
 var masterVM = {
@@ -44,12 +43,9 @@ function initializeKO() {
   ko.applyBindings(masterVM);
 };
 
-//theFilterVM.filterText.subscribe(function(newValue) {
-// console.log("MRA subcribe func");
-//});
-
 ko.bindingHandlers.map = {
     init: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
+	console.log("MRA map init ", allBindings());
         var marker = new google.maps.Marker({
             map: allBindings().map,
             position: allBindings().markerConfig.position,
@@ -76,8 +72,11 @@ ko.bindingHandlers.map = {
     bindingContext.$data._mapMarker = marker;
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
+	console.log("MRA map update", allBindings());
+	console.log("MRA map update", allBindings().visible());
         bindingContext.$data._mapMarker.setTitle(allBindings().markerConfig.title);
         bindingContext.$data._mapMarker.setPosition(allBindings().markerConfig.position);
+        bindingContext.$data._mapMarker.setVisible(allBindings().visible());
     }
 };
 
