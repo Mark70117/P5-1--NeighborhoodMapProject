@@ -22,9 +22,10 @@
         <div class="row">
           <div class="col-sm-5 col-sm-offset-1">
             <form class="form-horizontal">
-              <div class="form-group">
-                <div class="col-xs-10">
-                  <input class="form-control" placeholder="Website URL" required="" type="homepage">
+              <div class="form-group" data-bind="with: filterVM">
+                <div id="filterText" class="col-xs-10">
+                  <input class="form-control" placeholder="Website URL" data-bind="textInput: filterText"></input>
+		  <div data-bind="text: filterText"></div>
                 </div>
               </div>
             </form>
@@ -34,9 +35,9 @@
                 <h2>Hong Kong</h2>
               </div>
               <div class="col-md-6" id="mra1">
-                <div id="markersListView">
-                  <div data-bind="foreach: markers">
-                    <div data-bind='text: markerConfig().title'></div>
+                <div id="markersListView" >
+                  <div data-bind="foreach:mapVM.markers">
+                    <div data-bind='text: markerConfig().title, visible: masterVM.filterVM.foobar(markerConfig().title)'></div>
                   </div>
                 </div>
               </div><!--/col-6-->
@@ -45,7 +46,7 @@
           <div class="col-sm-6 map">
             <div class="google-map-canvas" id="map-canvas"></div>
             <div id="markers">
-              <div data-bind="foreach: markers">
+              <div data-bind="foreach:mapVM.markers">
                 <div data-bind='markerConfig: markerConfig(), map: map'></div>
               </div>
             </div>

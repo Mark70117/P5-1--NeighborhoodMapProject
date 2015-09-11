@@ -1,8 +1,24 @@
 var map;
 var lastStarMarker ;
 var firebase = new Firebase("https://popping-heat-1511.firebaseio.com/markers");
-var viewModel = {
-    "markers": KnockoutFire.observable(
+
+var FilterVM = function() {
+    var self = this ;
+    self.filterText =  ko.observable("");
+    self.foobar = function(foo) {
+      return ko.computed({
+        read: function() {
+          console.log("MRA FOO: ",foo);
+          return self.filterText() === foo;
+        }
+      });
+    };
+};
+
+var MapViewModel = function() {
+    var self = this ;
+    self.simple = ko.observable("simple");
+    self.markers =  KnockoutFire.observable(
         firebase, {
             "$marker": {
                 "content": true,
@@ -12,19 +28,33 @@ var viewModel = {
                 ".priority": function() { return Date.now() }
             }
         }
-    ),
-    "removeMarker": function(marker) {
+    );
+    self.removeMarker = function(marker) {
         firebase.child(marker.firebase.name()).remove();
-    }
+    };
+
+
+};
+
+var masterVM = {
+  filterVM : new FilterVM(), 
+  mapVM: new MapViewModel()
 };
 
 function initializeKO() {
-  ko.applyBindings(viewModel, document.getElementById("markers"));
-  ko.applyBindings(viewModel, document.getElementById("markersListView"));
+  ko.applyBindings(masterVM);
 };
+
+//theFilterVM.filterText.subscribe(function(newValue) {
+// console.log("MRA subcribe func");
+//});
 
 ko.bindingHandlers.map = {
     init: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
+        console.log("MRA ","ko.bindingHandler.map ","init enter");
+        console.log("MRA ","ko.bindingHandler.map ", element);
+        console.log("MRA ","ko.bindingHandler.map ", valueAccessor);
+        console.log("MRA ","ko.bindingHandler.map ", allBindings().map);
         var marker = new google.maps.Marker({
             map: allBindings().map,
             position: allBindings().markerConfig.position,
@@ -51,6 +81,7 @@ ko.bindingHandlers.map = {
     bindingContext.$data._mapMarker = marker;
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
+        console.log("MRA ","ko.bindingHandler.map ","update enter");
         bindingContext.$data._mapMarker.setTitle(allBindings().markerConfig.title);
         bindingContext.$data._mapMarker.setPosition(allBindings().markerConfig.position);
     }
