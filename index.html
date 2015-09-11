@@ -24,7 +24,7 @@
             <form class="form-horizontal">
               <div class="form-group" data-bind="with: filterVM">
                 <div id="filterText" class="col-xs-10">
-                  <input class="form-control" placeholder="Website URL" data-bind="textInput: filterText"></input>
+                  <input class="form-control" placeholder="Search string" data-bind="textInput: filterText"></input>
 		  <div data-bind="text: filterText"></div>
                 </div>
               </div>
@@ -37,7 +37,7 @@
               <div class="col-md-6" id="mra1">
                 <div id="markersListView" >
                   <div data-bind="foreach:mapVM.markers">
-                    <div data-bind='text: markerConfig().title, visible: masterVM.filterVM.foobar(markerConfig().title)'></div>
+                    <div data-bind='text: markerConfig().title, visible: masterVM.filterVM.filterTextPresent(markerConfig().title)'></div>
                   </div>
                 </div>
               </div><!--/col-6-->

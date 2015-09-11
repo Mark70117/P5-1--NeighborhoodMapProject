@@ -5,11 +5,10 @@ var firebase = new Firebase("https://popping-heat-1511.firebaseio.com/markers");
 var FilterVM = function() {
     var self = this ;
     self.filterText =  ko.observable("");
-    self.foobar = function(foo) {
+    self.filterTextPresent = function(baseStr) {
       return ko.computed({
         read: function() {
-          console.log("MRA FOO: ",foo);
-          return self.filterText() === foo;
+          return baseStr.toLowerCase().indexOf(self.filterText().toLowerCase()) >= 0;
         }
       });
     };
@@ -51,10 +50,6 @@ function initializeKO() {
 
 ko.bindingHandlers.map = {
     init: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
-        console.log("MRA ","ko.bindingHandler.map ","init enter");
-        console.log("MRA ","ko.bindingHandler.map ", element);
-        console.log("MRA ","ko.bindingHandler.map ", valueAccessor);
-        console.log("MRA ","ko.bindingHandler.map ", allBindings().map);
         var marker = new google.maps.Marker({
             map: allBindings().map,
             position: allBindings().markerConfig.position,
@@ -81,7 +76,6 @@ ko.bindingHandlers.map = {
     bindingContext.$data._mapMarker = marker;
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
-        console.log("MRA ","ko.bindingHandler.map ","update enter");
         bindingContext.$data._mapMarker.setTitle(allBindings().markerConfig.title);
         bindingContext.$data._mapMarker.setPosition(allBindings().markerConfig.position);
     }
