@@ -134,7 +134,6 @@ function foursquareAPIwrapper(gMapMarker) {
         '&ll=' + lat + ',' + lng +
         '&intent=checkin' +
         '&limit=4'
-  // TODO increase limit to try and match close together locations
   console.log(url);
   $.ajax({
     url: url,
@@ -149,9 +148,11 @@ function foursquareAPIwrapper(gMapMarker) {
       }
       console.log(matchingVenue);
       masterVM.mapVM.setVenue(matchingVenue);
+   },
+   error: function(XMLHttpRequest, textStatus, errorThrown) {
+       alert("Difficulty contacting foursquare! " + errorThrown);
    }
   });
-  //TODO ajax failure
 }
 
 function initializeMap() {
