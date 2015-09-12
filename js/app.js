@@ -1,12 +1,11 @@
+
 var PIN_ICON = 'icons/pin-export.png';
 var STAR_ICON = 'icons/star-3.png';
 var MAP_HOME_LAT = 29.967969 ;
 var MAP_HOME_LNG = -90.056589;
 
-
 var map;
-// TODO move inside viewModel
-var lastStarMarker ;
+// TODO firebase broken?
 var firebase = new Firebase("https://popping-heat-1511.firebaseio.com/markers");
 
 var FilterVM = function () {
@@ -23,6 +22,7 @@ var FilterVM = function () {
 
 var MapViewModel = function () {
     var self = this ;
+    self.lastStarMarker = false ;
     self.markers =  KnockoutFire.observable(
         firebase, {
             "$marker": {
@@ -50,13 +50,13 @@ var MapViewModel = function () {
                  console.log("MRA click",marker.getPosition().lat());
                  console.log("MRA click",marker.getPosition().lng());
                  foursquareAPIwrapper(marker);
-                 if (lastStarMarker) {
-                     lastStarMarker.setIcon(PIN_ICON);
-                     lastStarMarker.setZIndex(0);
+                 if (self.lastStarMarker) {
+                     self.lastStarMarker.setIcon(PIN_ICON);
+                     self.lastStarMarker.setZIndex(0);
                  }
                  marker.setIcon(STAR_ICON);
                  marker.setZIndex(1);
-                 lastStarMarker = marker;
+                 self.lastStarMarker = marker;
             }
         };
 
@@ -98,6 +98,7 @@ function initializeKO() {
 
 ko.bindingHandlers.map = {
     init: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
+	//TODO firebase working?
 	console.log("MRA map init ", allBindings());
         var marker = new google.maps.Marker({
             map: allBindings().map,
@@ -112,6 +113,7 @@ ko.bindingHandlers.map = {
         google.maps.event.addListener(marker, 'click', bindingContext.$data._markerClickFn);
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
+	//TODO firebase working?
         var mapMarker = bindingContext.$data._mapMarker ;
         // change in backend db (title, position) could have triggered update
         mapMarker.setTitle(allBindings().markerConfig.title);
