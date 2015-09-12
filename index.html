@@ -25,14 +25,26 @@
               <div class="form-group" data-bind="with: filterVM">
                 <div id="filterText" class="col-xs-10">
                   <input class="form-control" placeholder="Search string" data-bind="textInput: filterText"></input>
-		  <div data-bind="text: filterText"></div>
                 </div>
               </div>
             </form>
             <hr>
             <div class="row">
               <div class="col-md-6" id="mra0">
-                <h2>Hong Kong</h2>
+                <h2>Selected Marker</h2>
+                <h3 data-bind="text: mapVM.venueName()"></h3>
+                <div data-bind="if: mapVM.venueCategory">
+                  <em data-bind="text: mapVM.venueCategory()"></em><br>
+                </div>
+                <div data-bind="if: mapVM.venueAddress">
+                  <span data-bind="text: mapVM.venueAddress()"></span><br>
+                </div>
+                <div data-bind="if: mapVM.venueURL">
+                  <a data-bind="attr: { href: mapVM.venueURL() }"><span data-bind="text: mapVM.venueURL()"></span></a><br>
+                </div>
+                <div data-bind="if: mapVM.venuePhone">
+                  <span data-bind="text: mapVM.venuePhone()"></span>
+                </div>
               </div>
               <div class="col-md-6" id="mra1">
                 <div id="markersListView" >

@@ -5,24 +5,24 @@ var MAP_HOME_LNG = -90.056589;
 
 
 var map;
+// TODO move inside viewModel
 var lastStarMarker ;
 var firebase = new Firebase("https://popping-heat-1511.firebaseio.com/markers");
 
-var FilterVM = function() {
+var FilterVM = function () {
     var self = this ;
     self.filterText =  ko.observable("");
-    self.filterTextPresent = function(baseStr) {
+    self.filterTextPresent = function (baseStr) {
       return ko.computed({
-        read: function() {
+        read: function () {
           return baseStr.toLowerCase().indexOf(self.filterText().toLowerCase()) >= 0;
         }
       });
     };
 };
 
-var MapViewModel = function() {
+var MapViewModel = function () {
     var self = this ;
-    self.simple = ko.observable("simple");
     self.markers =  KnockoutFire.observable(
         firebase, {
             "$marker": {
@@ -30,21 +30,26 @@ var MapViewModel = function() {
                 "markerConfig": true
             },
             ".newItem": {
-                ".priority": function() { return Date.now() }
+                ".priority": function () { return Date.now() }
             }
         }
     );
-    self.removeMarker = function(marker) {
+    self.removeMarker = function (marker) {
         firebase.child(marker.firebase.name()).remove();
     };
+
+    self.venueName = ko.observable("");
+    self.venueURL = ko.observable("");
+    self.venueAddress = ko.observable("");
+    self.venuePhone = ko.observable("");
+    self.venueCategory = ko.observable("");
 
     self.markerClickFunc = function (marker, i) {
                  return function () {
                  console.log("MRA click",i);
                  console.log("MRA click",marker.getPosition().lat());
                  console.log("MRA click",marker.getPosition().lng());
-                 var position = marker.getPosition();
-                 callFoursquareAPI(position.lat(), position.lng());
+                 foursquareAPIwrapper(marker);
                  if (lastStarMarker) {
                      lastStarMarker.setIcon(PIN_ICON);
                      lastStarMarker.setZIndex(0);
@@ -52,15 +57,32 @@ var MapViewModel = function() {
                  marker.setIcon(STAR_ICON);
                  marker.setZIndex(1);
                  lastStarMarker = marker;
-                 //infowindow.setContent(hk_markers[i].name);
-                 //infowindow.open(map, marker);
             }
         };
 
-    self.clickMarker= function() {
+    self.clickMarker = function () {
         // make sure markerClickFN has been set up.
         if (typeof this._markerClickFn === "function") {
             this._markerClickFn();
+        }
+    };
+    self.setVenue = function (foursquareVenue) {
+        self.venueName(foursquareVenue.name);
+        self.venueURL(foursquareVenue.url ? foursquareVenue.url : "" );
+        if (foursquareVenue.location) {
+          self.venueAddress(foursquareVenue.location.address ? foursquareVenue.location.address : "");
+        } else {
+          self.venueAddress("");
+        }
+        if (foursquareVenue.contact) {
+          self.venuePhone(foursquareVenue.contact.formattedPhone ? foursquareVenue.contact.formattedPhone : "");
+        } else {
+          self.venuePhone("");
+        }
+        if (foursquareVenue.categories[0]) {
+          self.venueCategory(foursquareVenue.categories[0].name ? foursquareVenue.categories[0].name : "");
+        } else {
+          self.venueCategory("");
         }
     };
 };
@@ -99,8 +121,12 @@ ko.bindingHandlers.map = {
     }
 };
 
-//TODO rename as wrapper
-function callFoursquareAPI(lat,lng) {
+function foursquareAPIwrapper(gMapMarker) {
+  var title = gMapMarker.getTitle(); 
+  var position = gMapMarker.getPosition();
+  var lat = position.lat(); 
+  var lng = position.lng();
+
   url = 'https://api.foursquare.com/v2/venues/search' +
         '?client_id=3MQGWJDDFWX1OGYLXRRTV4FQJ4RKEOXHGHSREFHGFQVYXZZZ' +
         '&client_secret=RZ3VWUPP0WAYLZGKGA1GSZYUBLLPRDQ40YDNG4KE0COFQUVF' +
@@ -113,10 +139,16 @@ function callFoursquareAPI(lat,lng) {
   $.ajax({
     url: url,
     success: function (result) {
-      console.log(0,result.response.venues[0].name);
-      console.log(1,result.response.venues[1].name);
-      console.log(2,result.response.venues[2].name);
-      console.log(3,result.response.venues[3].name);
+      venues = result.response.venues;
+      matchingVenue = {};
+      for (i = 0; i < venues.length; i++) {
+        if (venues[i].name === title) { 
+          matchingVenue = venues[i];
+          break;
+        }
+      }
+      console.log(matchingVenue);
+      masterVM.mapVM.setVenue(matchingVenue);
    }
   });
   //TODO ajax failure
@@ -143,7 +175,7 @@ function initializeAll() {
   initializeMap();
 };
 
-$(function() {
+$(function () {
   initializeAll();
 });
 
