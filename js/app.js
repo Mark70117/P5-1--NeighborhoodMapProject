@@ -31,7 +31,12 @@ var MapViewModel = function() {
     self.removeMarker = function(marker) {
         firebase.child(marker.firebase.name()).remove();
     };
-    self.foobar = function() {};
+
+    self.clickMarker= function() {
+      console.log("MRA foobar");
+      console.log(this._mapMarker);
+      mra(this._mapMarker,'foo')();
+    };
 };
 
 var masterVM = {
@@ -43,17 +48,7 @@ function initializeKO() {
   ko.applyBindings(masterVM);
 };
 
-ko.bindingHandlers.map = {
-    init: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
-	console.log("MRA map init ", allBindings());
-        var marker = new google.maps.Marker({
-            map: allBindings().map,
-            position: allBindings().markerConfig.position,
-            icon: 'icons/pin-export.png',
-            title: allBindings().markerConfig.title
-        });
-        var i = allBindings().markerConfig.title;
-             google.maps.event.addListener(marker, 'click', (function (marker, i) {
+var mra = function (marker, i) {
                  return function () {
                  console.log("MRA click",i);
                  console.log("MRA click",marker.getPosition().lat());
@@ -68,8 +63,20 @@ ko.bindingHandlers.map = {
                  //infowindow.setContent(hk_markers[i].name);
                  //infowindow.open(map, marker);
             }
-        })(marker, i));
-    bindingContext.$data._mapMarker = marker;
+        };
+
+ko.bindingHandlers.map = {
+    init: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
+	console.log("MRA map init ", allBindings());
+        var marker = new google.maps.Marker({
+            map: allBindings().map,
+            position: allBindings().markerConfig.position,
+            icon: 'icons/pin-export.png',
+            title: allBindings().markerConfig.title
+        });
+        var i = allBindings().markerConfig.title;
+        google.maps.event.addListener(marker, 'click', mra(marker, i));
+        bindingContext.$data._mapMarker = marker;
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
 	console.log("MRA map update", allBindings());
