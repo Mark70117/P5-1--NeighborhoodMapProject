@@ -33,9 +33,8 @@ var MapViewModel = function() {
     };
 
     self.clickMarker= function() {
-      console.log("MRA foobar");
-      console.log(this._mapMarker);
-      mra(this._mapMarker,'foo')();
+      // TODO checkif difined begore calling
+      this._markerClickFn();
     };
 };
 
@@ -48,16 +47,19 @@ function initializeKO() {
   ko.applyBindings(masterVM);
 };
 
-var mra = function (marker, i) {
+// TODO move inside view model
+var markerClickFunc = function (marker, i) {
                  return function () {
                  console.log("MRA click",i);
                  console.log("MRA click",marker.getPosition().lat());
                  console.log("MRA click",marker.getPosition().lng());
                  var position = marker.getPosition();
                  callFoursquareAPI(position.lat(), position.lng());
+                 // TODO use constant to defind icon
                  if (lastStarMarker) {
                      lastStarMarker.setIcon('icons/pin-export.png');
                  }
+                 // TODO use constant to defind icon
                  marker.setIcon('icons/star-3.png');
                  lastStarMarker = marker;
                  //infowindow.setContent(hk_markers[i].name);
@@ -75,18 +77,21 @@ ko.bindingHandlers.map = {
             title: allBindings().markerConfig.title
         });
         var i = allBindings().markerConfig.title;
-        google.maps.event.addListener(marker, 'click', mra(marker, i));
         bindingContext.$data._mapMarker = marker;
+        bindingContext.$data._markerClickFn = markerClickFunc(marker, allBindings().markerConfig.title);
+        google.maps.event.addListener(marker, 'click', bindingContext.$data._markerClickFn);
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
 	console.log("MRA map update", allBindings());
 	console.log("MRA map update", allBindings().visible());
+	// TODO use local vars to DRY
         bindingContext.$data._mapMarker.setTitle(allBindings().markerConfig.title);
         bindingContext.$data._mapMarker.setPosition(allBindings().markerConfig.position);
         bindingContext.$data._mapMarker.setVisible(allBindings().visible());
     }
 };
 
+//TODO rename as wrapper
 function callFoursquareAPI(lat,lng) {
   url = 'https://api.foursquare.com/v2/venues/search' +
         '?client_id=3MQGWJDDFWX1OGYLXRRTV4FQJ4RKEOXHGHSREFHGFQVYXZZZ' +
@@ -95,11 +100,13 @@ function callFoursquareAPI(lat,lng) {
         '&ll=' + lat + ',' + lng +
         '&intent=checkin' +
         '&limit=1'
+  // TODO increase limit to try and match close together locations
   console.log(url);
   $.ajax({
     url: url,
     success: function (result) { console.log(result.response.venues[0].name); }
   });
+  //TODO ajax failure
 }
 
 function initializeMap() {
@@ -107,6 +114,7 @@ function initializeMap() {
   // var mapOptions = {
   //    disableDefaultUI: true
   //};
+  // TODO figure better zome and center
   var mapOptions = {
     zoom: 16,
     center: new google.maps.LatLng(29.966027, -90.061787)
