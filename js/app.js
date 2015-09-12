@@ -1,3 +1,9 @@
+var PIN_ICON = 'icons/pin-export.png';
+var STAR_ICON = 'icons/star-3.png';
+var MAP_HOME_LAT = 29.967969 ;
+var MAP_HOME_LNG = -90.056589;
+
+
 var map;
 var lastStarMarker ;
 var firebase = new Firebase("https://popping-heat-1511.firebaseio.com/markers");
@@ -32,6 +38,25 @@ var MapViewModel = function() {
         firebase.child(marker.firebase.name()).remove();
     };
 
+    self.markerClickFunc = function (marker, i) {
+                 return function () {
+                 console.log("MRA click",i);
+                 console.log("MRA click",marker.getPosition().lat());
+                 console.log("MRA click",marker.getPosition().lng());
+                 var position = marker.getPosition();
+                 callFoursquareAPI(position.lat(), position.lng());
+                 if (lastStarMarker) {
+                     lastStarMarker.setIcon(PIN_ICON);
+                     lastStarMarker.setZIndex(0);
+                 }
+                 marker.setIcon(STAR_ICON);
+                 marker.setZIndex(1);
+                 lastStarMarker = marker;
+                 //infowindow.setContent(hk_markers[i].name);
+                 //infowindow.open(map, marker);
+            }
+        };
+
     self.clickMarker= function() {
       // TODO checkif difined begore calling
       this._markerClickFn();
@@ -39,33 +64,13 @@ var MapViewModel = function() {
 };
 
 var masterVM = {
-  filterVM : new FilterVM(), 
+  filterVM : new FilterVM(),
   mapVM: new MapViewModel()
 };
 
 function initializeKO() {
   ko.applyBindings(masterVM);
 };
-
-// TODO move inside view model
-var markerClickFunc = function (marker, i) {
-                 return function () {
-                 console.log("MRA click",i);
-                 console.log("MRA click",marker.getPosition().lat());
-                 console.log("MRA click",marker.getPosition().lng());
-                 var position = marker.getPosition();
-                 callFoursquareAPI(position.lat(), position.lng());
-                 // TODO use constant to defind icon
-                 if (lastStarMarker) {
-                     lastStarMarker.setIcon('icons/pin-export.png');
-                 }
-                 // TODO use constant to defind icon
-                 marker.setIcon('icons/star-3.png');
-                 lastStarMarker = marker;
-                 //infowindow.setContent(hk_markers[i].name);
-                 //infowindow.open(map, marker);
-            }
-        };
 
 ko.bindingHandlers.map = {
     init: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
@@ -74,11 +79,12 @@ ko.bindingHandlers.map = {
             map: allBindings().map,
             position: allBindings().markerConfig.position,
             icon: 'icons/pin-export.png',
-            title: allBindings().markerConfig.title
+            title: allBindings().markerConfig.title,
+            zIndex: 0
         });
         var i = allBindings().markerConfig.title;
         bindingContext.$data._mapMarker = marker;
-        bindingContext.$data._markerClickFn = markerClickFunc(marker, allBindings().markerConfig.title);
+        bindingContext.$data._markerClickFn = masterVM.mapVM.markerClickFunc(marker, allBindings().markerConfig.title);
         google.maps.event.addListener(marker, 'click', bindingContext.$data._markerClickFn);
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
@@ -99,12 +105,17 @@ function callFoursquareAPI(lat,lng) {
         '&v=20130815' +
         '&ll=' + lat + ',' + lng +
         '&intent=checkin' +
-        '&limit=1'
+        '&limit=4'
   // TODO increase limit to try and match close together locations
   console.log(url);
   $.ajax({
     url: url,
-    success: function (result) { console.log(result.response.venues[0].name); }
+    success: function (result) {
+      console.log(0,result.response.venues[0].name);
+      console.log(1,result.response.venues[1].name);
+      console.log(2,result.response.venues[2].name);
+      console.log(3,result.response.venues[3].name);
+   }
   });
   //TODO ajax failure
 }
@@ -116,8 +127,8 @@ function initializeMap() {
   //};
   // TODO figure better zome and center
   var mapOptions = {
-    zoom: 16,
-    center: new google.maps.LatLng(29.966027, -90.061787)
+    zoom: 15,
+    center: new google.maps.LatLng(MAP_HOME_LAT, MAP_HOME_LNG)
   };
 
   map = new google.maps.Map(
