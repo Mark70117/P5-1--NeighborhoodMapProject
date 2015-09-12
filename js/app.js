@@ -58,8 +58,10 @@ var MapViewModel = function() {
         };
 
     self.clickMarker= function() {
-      // TODO checkif difined begore calling
-      this._markerClickFn();
+        // make sure markerClickFN has been set up.
+        if (typeof this._markerClickFn === "function") {
+            this._markerClickFn();
+        }
     };
 };
 
@@ -88,12 +90,12 @@ ko.bindingHandlers.map = {
         google.maps.event.addListener(marker, 'click', bindingContext.$data._markerClickFn);
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
-	console.log("MRA map update", allBindings());
-	console.log("MRA map update", allBindings().visible());
-	// TODO use local vars to DRY
-        bindingContext.$data._mapMarker.setTitle(allBindings().markerConfig.title);
-        bindingContext.$data._mapMarker.setPosition(allBindings().markerConfig.position);
-        bindingContext.$data._mapMarker.setVisible(allBindings().visible());
+        var mapMarker = bindingContext.$data._mapMarker ;
+        // change in backend db (title, position) could have triggered update
+        mapMarker.setTitle(allBindings().markerConfig.title);
+        mapMarker.setPosition(allBindings().markerConfig.position);
+        // search filter triggered update
+        mapMarker.setVisible(allBindings().visible());
     }
 };
 
@@ -122,10 +124,6 @@ function callFoursquareAPI(lat,lng) {
 
 function initializeMap() {
 
-  // var mapOptions = {
-  //    disableDefaultUI: true
-  //};
-  // TODO figure better zome and center
   var mapOptions = {
     zoom: 15,
     center: new google.maps.LatLng(MAP_HOME_LAT, MAP_HOME_LNG)
