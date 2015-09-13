@@ -6,7 +6,7 @@
     <meta name="description" content="P5-1: Neighborhood Map Project">
     <meta name="author" content="Mark Anderson <P5-1.FEND.udacity.com@ma7.org>">
     <title>Project 5-1: Neighborhood Map Project</title>
-        <link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
@@ -18,57 +18,57 @@
   </head>
 
   <body>
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-sm-5 col-sm-offset-1">
-            <form class="form-horizontal">
-              <div class="form-group" data-bind="with: filterVM">
-                <div id="filterText" class="col-xs-10">
-                  <input class="form-control" placeholder="Search string" data-bind="textInput: filterText"></input>
-                </div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-5 col-sm-offset-1">
+          <form class="form-horizontal">
+            <div class="form-group" data-bind="with: filterVM">
+              <div id="filterText" class="col-xs-10">
+                <input class="form-control" placeholder="Search string" data-bind="textInput: filterText"></input>
               </div>
-            </form>
-            <hr>
-            <div class="row">
-              <div class="col-md-6" id="star-marker-desc" data-bind="with: mapVM">
-                <h2 data-bind="if: venueName().length === 0">Select Marker</h2>
-                <h3 data-bind="text: venueName()"></h3>
-                <div data-bind="if: venueCategory">
-                  <em data-bind="text: venueCategory()"></em><br>
-                </div>
-                <div data-bind="if: venueAddress">
-                  <span data-bind="text: venueAddress()"></span><br>
-                </div>
-                <div data-bind="if: venueURL">
-                  <a data-bind="attr: { href: venueURL() }"><span data-bind="text: venueURL()"></span></a><br>
-                </div>
-                <div data-bind="if: venuePhone">
-                  <span data-bind="text: venuePhone()"></span>
-                </div>
+            </div>
+          </form>
+          <hr>
+          <div class="row">
+            <div class="col-md-6" id="star-marker-desc" data-bind="with: mapVM">
+              <h2 data-bind="if: venueName().length === 0">Select Marker</h2>
+              <h3 data-bind="text: venueName()"></h3>
+              <div data-bind="if: venueCategory">
+                <em data-bind="text: venueCategory()"></em><br>
               </div>
-              <div class="col-md-6" id="marker-menu">
-                <div id="markersListView" >
-                  <div data-bind="foreach:mapVM.markers">
-                    <div data-bind="visible: masterVM.filterVM.filterTextPresent(markerConfig().title)">
-                      <button class="locationButton" data-bind="click: masterVM.mapVM.clickMarker">
-                        <div data-bind='text: markerConfig().title'></div>
-                      </button><br/>
-                    </div>
+              <div data-bind="if: venueAddress">
+                <span data-bind="text: venueAddress()"></span><br>
+              </div>
+              <div data-bind="if: venueURL">
+                <a data-bind="attr: { href: venueURL() }"><span data-bind="text: venueURL()"></span></a><br>
+              </div>
+              <div data-bind="if: venuePhone">
+                <span data-bind="text: venuePhone()"></span>
+              </div>
+            </div>
+            <div class="col-md-6" id="marker-menu">
+              <div id="markersListView" >
+                <div data-bind="foreach:mapVM.markers">
+                  <div data-bind="visible: masterVM.filterVM.filterTextPresent(markerConfig().title)">
+                    <button class="locationButton" data-bind="click: masterVM.mapVM.clickMarker">
+                      <div data-bind='text: markerConfig().title'></div>
+                    </button><br/>
                   </div>
                 </div>
-              </div><!--/col-6-->
-            </div><!--/row-->
-          </div><!--/col-5-->
-          <div class="col-sm-6 map">
-            <div class="google-map-canvas" id="map-canvas"></div>
-            <div id="markers">
-              <div data-bind="foreach:mapVM.markers">
-                <div data-bind='markerConfig: markerConfig(), map: map, visible: masterVM.filterVM.filterTextPresent(markerConfig().title)'></div>
               </div>
+            </div><!--/col-6-->
+          </div><!--/row-->
+        </div><!--/col-5-->
+        <div class="col-sm-6 map">
+          <div class="google-map-canvas" id="map-canvas"></div>
+          <div id="markers">
+            <div data-bind="foreach:mapVM.markers">
+              <div data-bind='markerConfig: markerConfig(), map: map, visible: masterVM.filterVM.filterTextPresent(markerConfig().title)'></div>
             </div>
           </div>
         </div>
       </div>
-    </body>
+    </div>
+  </body>
 </html>
 

@@ -51,21 +51,18 @@ var MapViewModel = function () {
     self.venuePhone = ko.observable("");
     self.venueCategory = ko.observable("");
 
-    self.markerClickFunc = function (marker, i) {
-                 return function () {
-                 console.log("MRA click",i);
-                 console.log("MRA click",marker.getPosition().lat());
-                 console.log("MRA click",marker.getPosition().lng());
-                 foursquareAPIwrapper(marker);
-                 if (self.lastStarMarker) {
-                     self.lastStarMarker.setIcon(PIN_ICON);
-                     self.lastStarMarker.setZIndex(0);
-                 }
-                 marker.setIcon(STAR_ICON);
-                 marker.setZIndex(1);
-                 self.lastStarMarker = marker;
+    self.markerClickFunc = function (marker) {
+        return function () {
+            foursquareAPIwrapper(marker);
+            if (self.lastStarMarker) {
+                self.lastStarMarker.setIcon(PIN_ICON);
+                self.lastStarMarker.setZIndex(0);
             }
-        };
+            marker.setIcon(STAR_ICON);
+            marker.setZIndex(1);
+            self.lastStarMarker = marker;
+        }
+    };
 
     self.clickMarker = function () {
         // make sure markerClickFN has been set up.
@@ -73,6 +70,7 @@ var MapViewModel = function () {
             this._markerClickFn();
         }
     };
+
     self.setVenue = function (foursquareVenue) {
         self.venueName(foursquareVenue.name);
         self.venueURL(foursquareVenue.url ? foursquareVenue.url : "" );
@@ -106,7 +104,6 @@ function initializeKO() {
 ko.bindingHandlers.map = {
     init: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
 	//TODO firebase working?
-	console.log("MRA map init ", allBindings());
         var marker = new google.maps.Marker({
             map: allBindings().map,
             position: allBindings().markerConfig.position,
@@ -114,9 +111,8 @@ ko.bindingHandlers.map = {
             title: allBindings().markerConfig.title,
             zIndex: 0
         });
-        var i = allBindings().markerConfig.title;
         bindingContext.$data._mapMarker = marker;
-        bindingContext.$data._markerClickFn = masterVM.mapVM.markerClickFunc(marker, allBindings().markerConfig.title);
+        bindingContext.$data._markerClickFn = masterVM.mapVM.markerClickFunc(marker);
         google.maps.event.addListener(marker, 'click', bindingContext.$data._markerClickFn);
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
@@ -143,7 +139,6 @@ function foursquareAPIwrapper(gMapMarker) {
         '&ll=' + lat + ',' + lng +
         '&intent=checkin' +
         '&limit=4'
-  console.log(url);
   $.ajax({
     url: url,
     success: function (result) {
@@ -155,7 +150,6 @@ function foursquareAPIwrapper(gMapMarker) {
           break;
         }
       }
-      console.log(matchingVenue);
       masterVM.mapVM.setVenue(matchingVenue);
    },
    error: function(XMLHttpRequest, textStatus, errorThrown) {
