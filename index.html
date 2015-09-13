@@ -30,20 +30,20 @@
             </form>
             <hr>
             <div class="row">
-              <div class="col-md-6" id="star-marker-desc">
-                <h2 data-bind="if: mapVM.venueName().length === 0">Select Marker</h2>
-                <h3 data-bind="text: mapVM.venueName()"></h3>
-                <div data-bind="if: mapVM.venueCategory">
-                  <em data-bind="text: mapVM.venueCategory()"></em><br>
+              <div class="col-md-6" id="star-marker-desc" data-bind="with: mapVM">
+                <h2 data-bind="if: venueName().length === 0">Select Marker</h2>
+                <h3 data-bind="text: venueName()"></h3>
+                <div data-bind="if: venueCategory">
+                  <em data-bind="text: venueCategory()"></em><br>
                 </div>
-                <div data-bind="if: mapVM.venueAddress">
-                  <span data-bind="text: mapVM.venueAddress()"></span><br>
+                <div data-bind="if: venueAddress">
+                  <span data-bind="text: venueAddress()"></span><br>
                 </div>
-                <div data-bind="if: mapVM.venueURL">
-                  <a data-bind="attr: { href: mapVM.venueURL() }"><span data-bind="text: mapVM.venueURL()"></span></a><br>
+                <div data-bind="if: venueURL">
+                  <a data-bind="attr: { href: venueURL() }"><span data-bind="text: venueURL()"></span></a><br>
                 </div>
-                <div data-bind="if: mapVM.venuePhone">
-                  <span data-bind="text: mapVM.venuePhone()"></span>
+                <div data-bind="if: venuePhone">
+                  <span data-bind="text: venuePhone()"></span>
                 </div>
               </div>
               <div class="col-md-6" id="marker-menu">
