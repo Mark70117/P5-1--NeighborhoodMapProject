@@ -1,0 +1,1 @@
+#map-canvas,.container-fluid,.map,.row,body,html{height:100%}@media only screen{#marker-menu,#star-marker-desc{max-height:90vh}}@media only screen and (max-device-width:991px){#marker-menu,#star-marker-desc{max-height:30vh}}#map-canvas{width:100%;height:calc(100% - 0px)}#marker-menu,#star-marker-desc{max-width:100%;overflow-x:auto;overflow-y:auto}.locationButton{width:100%}
