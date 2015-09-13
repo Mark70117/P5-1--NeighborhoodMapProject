@@ -48,7 +48,7 @@
             </div>
             <div class="col-md-6" id="marker-menu">
               <div id="markersListView" >
-                <h2 data-bind="if:  mapVM.markers().length === 0">Firebase DB inaccessible!  Try again later.</h2>
+                <h2 data-bind="if:  mapVM.markers().length === 0">Accessing firebase DB. Please wait</h2>
                 <div data-bind="foreach:mapVM.markers">
                   <div data-bind="visible: masterVM.filterVM.filterTextPresent(markerConfig().title)">
                     <button class="locationButton" data-bind="click: masterVM.mapVM.clickMarker">
