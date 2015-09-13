@@ -15,12 +15,12 @@ Please credit: Maps Icons Collection https://mapicons.mapsmarker.com
 var PIN_ICON = 'icons/pin-export.png';
 var STAR_ICON = 'icons/star-3.png';
 
+var FIREBASE_DB_URL = 'https://popping-heat-1511.firebaseio.com/markers';
 var MAP_HOME_LAT = 29.967969 ;
 var MAP_HOME_LNG = -90.056589;
 
 var map;
-// TODO firebase broken?
-var firebase = new Firebase("https://popping-heat-1511.firebaseio.com/markers");
+var firebase = new Firebase(FIREBASE_DB_URL);
 var masterVM;
 
 
@@ -142,7 +142,6 @@ var MapViewModel = function () {
 ko.bindingHandlers.map = {
     init: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
         'use strict';
-    //TODO firebase working?
         var marker = new google.maps.Marker({
             map: allBindings().map,
             position: allBindings().markerConfig.position,
@@ -156,7 +155,6 @@ ko.bindingHandlers.map = {
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
         'use strict';
-    //TODO firebase working?
         var mapMarker = bindingContext.$data._mapMarker ;
         // change in backend db (title, position) could have triggered update
         mapMarker.setTitle(allBindings().markerConfig.title);
