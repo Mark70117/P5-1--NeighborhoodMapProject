@@ -30,8 +30,8 @@
             </form>
             <hr>
             <div class="row">
-              <div class="col-md-6" id="mra0">
-                <h2>Selected Marker</h2>
+              <div class="col-md-6" id="star-marker-desc">
+                <h2 data-bind="if: mapVM.venueName().length === 0">Select Marker</h2>
                 <h3 data-bind="text: mapVM.venueName()"></h3>
                 <div data-bind="if: mapVM.venueCategory">
                   <em data-bind="text: mapVM.venueCategory()"></em><br>
@@ -46,7 +46,7 @@
                   <span data-bind="text: mapVM.venuePhone()"></span>
                 </div>
               </div>
-              <div class="col-md-6" id="mra1">
+              <div class="col-md-6" id="marker-menu">
                 <div id="markersListView" >
                   <div data-bind="foreach:mapVM.markers">
                     <div data-bind="visible: masterVM.filterVM.filterTextPresent(markerConfig().title)">
