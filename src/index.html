@@ -50,7 +50,7 @@
                 <div id="markersListView" >
                   <div data-bind="foreach:mapVM.markers">
                     <div data-bind="visible: masterVM.filterVM.filterTextPresent(markerConfig().title)">
-                      <button style="width:100%" data-bind="click: masterVM.mapVM.clickMarker">
+                      <button class="locationButton" data-bind="click: masterVM.mapVM.clickMarker">
                         <div data-bind='text: markerConfig().title'></div>
                       </button><br/>
                     </div>

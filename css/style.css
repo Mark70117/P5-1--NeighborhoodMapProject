@@ -47,3 +47,6 @@ html, body, .container-fluid, .row, .map { height: 100% }
     overflow-y: scroll;
 }
 
+.locationButton {
+    width: 100%;
+}
