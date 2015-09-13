@@ -1,6 +1,13 @@
 
+
+/*
+The project "Map Icons Collection" was created by Nicolas Mollet under the Creative Commons Attribution-Share Alike 3.0 Unported license 
+(CC BY SA 3.0 - http://creativecommons.org/licenses/by-sa/3.0/).
+Please credit: Maps Icons Collection https://mapicons.mapsmarker.com
+*/
 var PIN_ICON = 'icons/pin-export.png';
 var STAR_ICON = 'icons/star-3.png';
+
 var MAP_HOME_LAT = 29.967969 ;
 var MAP_HOME_LNG = -90.056589;
 
