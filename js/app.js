@@ -1,7 +1,14 @@
 
+/*global
+    Firebase,
+    KnockoutFire,
+    google,
+    $,
+    ko
+*/
 
 /*
-The project "Map Icons Collection" was created by Nicolas Mollet under the Creative Commons Attribution-Share Alike 3.0 Unported license 
+The project "Map Icons Collection" was created by Nicolas Mollet under the Creative Commons Attribution-Share Alike 3.0 Unported license
 (CC BY SA 3.0 - http://creativecommons.org/licenses/by-sa/3.0/).
 Please credit: Maps Icons Collection https://mapicons.mapsmarker.com
 */
@@ -14,8 +21,13 @@ var MAP_HOME_LNG = -90.056589;
 var map;
 // TODO firebase broken?
 var firebase = new Firebase("https://popping-heat-1511.firebaseio.com/markers");
+var masterVM;
+
+
 
 var FilterVM = function () {
+    'use strict';
+
     var self = this ;
     self.filterText =  ko.observable("");
     self.filterTextPresent = function (baseStr) {
@@ -27,7 +39,42 @@ var FilterVM = function () {
     };
 };
 
+function foursquareAPIwrapper (gMapMarker) {
+    'use strict';
+    var title = gMapMarker.getTitle();
+    var position = gMapMarker.getPosition();
+    var lat = position.lat();
+    var lng = position.lng();
+
+  var url = 'https://api.foursquare.com/v2/venues/search' +
+        '?client_id=3MQGWJDDFWX1OGYLXRRTV4FQJ4RKEOXHGHSREFHGFQVYXZZZ' +
+        '&client_secret=RZ3VWUPP0WAYLZGKGA1GSZYUBLLPRDQ40YDNG4KE0COFQUVF' +
+        '&v=20130815' +
+        '&ll=' + lat + ',' + lng +
+        '&intent=checkin' +
+        '&limit=4';
+  $.ajax({
+    url: url,
+    success: function (result) {
+        var venues = result.response.venues;
+        var matchingVenue = {};
+        for (var i = 0; i < venues.length; i=i+1) {
+            if (venues[i].name === title) {
+                matchingVenue = venues[i];
+                break;
+            }
+        }
+      masterVM.mapVM.setVenue(matchingVenue);
+   },
+   error: function (XMLHttpRequest, textStatus, errorThrown) {
+       alert("Difficulty contacting foursquare! " + errorThrown);
+   }
+  });
+}
+
 var MapViewModel = function () {
+    'use strict';
+
     var self = this ;
     self.lastStarMarker = false ;
     self.markers =  KnockoutFire.observable(
@@ -37,7 +84,7 @@ var MapViewModel = function () {
                 "markerConfig": true
             },
             ".newItem": {
-                ".priority": function () { return Date.now() }
+                ".priority": function () { return Date.now(); }
             }
         }
     );
@@ -61,7 +108,7 @@ var MapViewModel = function () {
             marker.setIcon(STAR_ICON);
             marker.setZIndex(1);
             self.lastStarMarker = marker;
-        }
+        };
     };
 
     self.clickMarker = function () {
@@ -92,18 +139,10 @@ var MapViewModel = function () {
     };
 };
 
-var masterVM = {
-  filterVM : new FilterVM(),
-  mapVM: new MapViewModel()
-};
-
-function initializeKO() {
-  ko.applyBindings(masterVM);
-};
-
 ko.bindingHandlers.map = {
     init: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
-	//TODO firebase working?
+        'use strict';
+    //TODO firebase working?
         var marker = new google.maps.Marker({
             map: allBindings().map,
             position: allBindings().markerConfig.position,
@@ -116,7 +155,8 @@ ko.bindingHandlers.map = {
         google.maps.event.addListener(marker, 'click', bindingContext.$data._markerClickFn);
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
-	//TODO firebase working?
+        'use strict';
+    //TODO firebase working?
         var mapMarker = bindingContext.$data._mapMarker ;
         // change in backend db (title, position) could have triggered update
         mapMarker.setTitle(allBindings().markerConfig.title);
@@ -126,60 +166,35 @@ ko.bindingHandlers.map = {
     }
 };
 
-function foursquareAPIwrapper(gMapMarker) {
-  var title = gMapMarker.getTitle(); 
-  var position = gMapMarker.getPosition();
-  var lat = position.lat(); 
-  var lng = position.lng();
+masterVM = {
+  filterVM : new FilterVM(),
+  mapVM: new MapViewModel()
+};
 
-  url = 'https://api.foursquare.com/v2/venues/search' +
-        '?client_id=3MQGWJDDFWX1OGYLXRRTV4FQJ4RKEOXHGHSREFHGFQVYXZZZ' +
-        '&client_secret=RZ3VWUPP0WAYLZGKGA1GSZYUBLLPRDQ40YDNG4KE0COFQUVF' +
-        '&v=20130815' +
-        '&ll=' + lat + ',' + lng +
-        '&intent=checkin' +
-        '&limit=4'
-  $.ajax({
-    url: url,
-    success: function (result) {
-      venues = result.response.venues;
-      matchingVenue = {};
-      for (i = 0; i < venues.length; i++) {
-        if (venues[i].name === title) { 
-          matchingVenue = venues[i];
-          break;
-        }
-      }
-      masterVM.mapVM.setVenue(matchingVenue);
-   },
-   error: function(XMLHttpRequest, textStatus, errorThrown) {
-       alert("Difficulty contacting foursquare! " + errorThrown);
-   }
-  });
+function initializeKO() {
+    'use strict';
+    ko.applyBindings(masterVM);
 }
 
 function initializeMap() {
+    'use strict';
+    var mapOptions = {
+        zoom: 15,
+        center: new google.maps.LatLng(MAP_HOME_LAT, MAP_HOME_LNG)
+    };
 
-  var mapOptions = {
-    zoom: 15,
-    center: new google.maps.LatLng(MAP_HOME_LAT, MAP_HOME_LNG)
-  };
+    map = new google.maps.Map(
+        document.getElementById('map-canvas'),
+        mapOptions
+    );
 
-  map = new google.maps.Map(
-    document.getElementById('map-canvas'),
-    mapOptions
-  );
-
-  // Sets the boundaries of the map based on pin locations
-  window.mapBounds = new google.maps.LatLngBounds();
+    // Sets the boundaries of the map based on pin locations
+    window.mapBounds = new google.maps.LatLngBounds();
 }
 
-function initializeAll() {
-  initializeKO();
-  initializeMap();
-};
-
 $(function () {
-  initializeAll();
+    'use strict';
+    initializeKO();
+    initializeMap();
 });
 
