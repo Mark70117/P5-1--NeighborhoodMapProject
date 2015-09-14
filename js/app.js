@@ -1,3 +1,9 @@
+/*
+ github.com/Mark70117/P5-1--NeighborhoodMapProject
+ by Mark Anderson <Mark70117@ma7.org>
+ Project 5 for Udacity Front End Nano Degree
+ Neighborhood Map Project
+*/
 
 /*global
     Firebase,
@@ -7,6 +13,10 @@
     ko
 */
 
+
+/*
+   CONSTANTS
+*/
 /*
 The project "Map Icons Collection" was created by Nicolas Mollet under the Creative Commons Attribution-Share Alike 3.0 Unported license
 (CC BY SA 3.0 - http://creativecommons.org/licenses/by-sa/3.0/).
@@ -19,26 +29,14 @@ var FIREBASE_DB_URL = 'https://popping-heat-1511.firebaseio.com/markers';
 var MAP_HOME_LAT = 29.967969 ;
 var MAP_HOME_LNG = -90.056589;
 
+/*
+  GLOBALS
+*/
 var map;
 var firebase = new Firebase(FIREBASE_DB_URL);
 var masterVM;
 
-
-
-var FilterVM = function () {
-    'use strict';
-
-    var self = this ;
-    self.filterText =  ko.observable("");
-    self.filterTextPresent = function (baseStr) {
-      return ko.computed({
-        read: function () {
-          return baseStr.toLowerCase().indexOf(self.filterText().toLowerCase()) >= 0;
-        }
-      });
-    };
-};
-
+// Helper function to wrap call to Foursquare API
 function foursquareAPIwrapper (gMapMarker) {
     'use strict';
     var title = gMapMarker.getTitle();
@@ -72,11 +70,35 @@ function foursquareAPIwrapper (gMapMarker) {
   });
 }
 
+// KnockoutJS view model for the search/filter string box
+var FilterVM = function () {
+    'use strict';
+
+    var self = this ;
+
+    self.filterText =  ko.observable("");
+
+    // Boolean function to indicate if search string in present in function parameter
+    self.filterTextPresent = function (baseStr) {
+      return ko.computed({
+        read: function () {
+          // ignore case in looking for search string
+          return baseStr.toLowerCase().indexOf(self.filterText().toLowerCase()) >= 0;
+        }
+      });
+    };
+};
+
+// KnockoutJS view model for the google map
 var MapViewModel = function () {
     'use strict';
 
     var self = this ;
+
     self.lastStarMarker = false ;
+
+
+    // uses KnockoutFire inteface between KnockoutJS and Firebase
     self.markers =  KnockoutFire.observable(
         firebase, {
             "$marker": {
@@ -88,16 +110,19 @@ var MapViewModel = function () {
             }
         }
     );
+
     self.removeMarker = function (marker) {
         firebase.child(marker.firebase.name()).remove();
     };
 
+    // Star Marker description
     self.venueName = ko.observable("");
     self.venueURL = ko.observable("");
     self.venueAddress = ko.observable("");
     self.venuePhone = ko.observable("");
     self.venueCategory = ko.observable("");
 
+    // define closure to call foursquare map API for a marker
     self.markerClickFunc = function (marker) {
         return function () {
             foursquareAPIwrapper(marker);
@@ -111,6 +136,8 @@ var MapViewModel = function () {
         };
     };
 
+    // function to duplicate the action of clicking on a marker
+    //   used by the list view
     self.clickMarker = function () {
         // make sure markerClickFN has been set up.
         if (typeof this._markerClickFn === "function") {
@@ -118,6 +145,7 @@ var MapViewModel = function () {
         }
     };
 
+    // convert return result from foursquare to KO obseravables
     self.setVenue = function (foursquareVenue) {
         self.venueName(foursquareVenue.name);
         self.venueURL(foursquareVenue.url ? foursquareVenue.url : "" );
@@ -139,6 +167,7 @@ var MapViewModel = function () {
     };
 };
 
+// create a custom binding map: for KnockoutJS to google maps functionality
 ko.bindingHandlers.map = {
     init: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
         'use strict';
@@ -164,16 +193,19 @@ ko.bindingHandlers.map = {
     }
 };
 
+// master VM to encapsulate sub view modules
 masterVM = {
   filterVM : new FilterVM(),
   mapVM: new MapViewModel()
 };
 
+// init function for KnockoutJS binding
 function initializeKO() {
     'use strict';
     ko.applyBindings(masterVM);
 }
 
+// init function for google map
 function initializeMap() {
     'use strict';
     var mapOptions = {
@@ -190,6 +222,7 @@ function initializeMap() {
     window.mapBounds = new google.maps.LatLngBounds();
 }
 
+// initialize view models and map when DOM is ready
 $(function () {
     'use strict';
     initializeKO();
