@@ -44,7 +44,7 @@ function foursquareAPIwrapper (gMapMarker) {
     var lat = position.lat();
     var lng = position.lng();
 
-  var url = 'https://api.foursquare.com/v2/venues/search' +
+    var url = 'https://api.foursquare.com/v2/venues/search' +
         '?client_id=3MQGWJDDFWX1OGYLXRRTV4FQJ4RKEOXHGHSREFHGFQVYXZZZ' +
         '&client_secret=RZ3VWUPP0WAYLZGKGA1GSZYUBLLPRDQ40YDNG4KE0COFQUVF' +
         '&v=20130815' +
@@ -218,8 +218,6 @@ function initializeMap() {
         mapOptions
     );
 
-    // Sets the boundaries of the map based on pin locations
-    window.mapBounds = new google.maps.LatLngBounds();
 }
 
 // initialize view models and map when DOM is ready
