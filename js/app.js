@@ -50,20 +50,18 @@ function foursquareAPIwrapper (gMapMarker, gInfoWindow) {
         '&v=20130815' +
         '&ll=' + lat + ',' + lng +
         '&intent=checkin' +
-        '&limit=4';
+        '&query=' + title +
+        '&limit=1';
     $.ajax({
         url: url,
         success: function (result) {
             var venues = result.response.venues;
-            var matchingVenue = {};
-            for (var i = 0; i < venues.length; i=i+1) {
-                if (venues[i].name === title) {
-                   matchingVenue = venues[i];
-                    break;
-                }
+            if (venues.length > 0) {
+                var matchingVenue = venues[0];
+                masterVM.mapVM.setVenue(matchingVenue, gInfoWindow);
+            } else {
+                alert("Difficulty matching venue on foursquare!");
             }
-            masterVM.mapVM.setVenue(matchingVenue);
-            gInfoWindow.setContent($('#star-marker-desc').html());
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             alert("Difficulty contacting foursquare! " + errorThrown);
@@ -98,7 +96,6 @@ var MapViewModel = function () {
 
     self.lastStarMarker = false ;
     self.lastStarInfoWindow = false ;
-
 
     // uses KnockoutFire inteface between KnockoutJS and Firebase
     self.markers =  KnockoutFire.observable(
@@ -154,24 +151,27 @@ var MapViewModel = function () {
     };
 
     // convert return result from foursquare to KO obseravables
-    self.setVenue = function (foursquareVenue) {
+    //  update google maps infowindow with updated venue content
+    self.setVenue = function (foursquareVenue, gInfoWindow) {
         self.venueName(foursquareVenue.name);
         self.venueURL(foursquareVenue.url ? foursquareVenue.url : "" );
         if (foursquareVenue.location) {
-          self.venueAddress(foursquareVenue.location.address ? foursquareVenue.location.address : "");
+            self.venueAddress(foursquareVenue.location.address ? foursquareVenue.location.address : "");
         } else {
-          self.venueAddress("");
+            self.venueAddress("");
         }
         if (foursquareVenue.contact) {
-          self.venuePhone(foursquareVenue.contact.formattedPhone ? foursquareVenue.contact.formattedPhone : "");
+            self.venuePhone(foursquareVenue.contact.formattedPhone ? foursquareVenue.contact.formattedPhone : "");
         } else {
-          self.venuePhone("");
+            self.venuePhone("");
         }
         if (foursquareVenue.categories[0]) {
-          self.venueCategory(foursquareVenue.categories[0].name ? foursquareVenue.categories[0].name : "");
+            self.venueCategory(foursquareVenue.categories[0].name ? foursquareVenue.categories[0].name : "");
         } else {
-          self.venueCategory("");
+            self.venueCategory("");
         }
+        gInfoWindow.setContent($('#star-marker-desc').html());
+
     };
 };
 
@@ -233,7 +233,6 @@ function initializeMap() {
         document.getElementById('map-canvas'),
         mapOptions
     );
-
 }
 
 // initialize view models and map when DOM is ready
