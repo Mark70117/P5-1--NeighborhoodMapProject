@@ -37,7 +37,7 @@ var firebase = new Firebase(FIREBASE_DB_URL);
 var masterVM;
 
 // Helper function to wrap call to Foursquare API
-function foursquareAPIwrapper (gMapMarker) {
+function foursquareAPIwrapper (gMapMarker, gInfoWindow) {
     'use strict';
     var title = gMapMarker.getTitle();
     var position = gMapMarker.getPosition();
@@ -51,23 +51,24 @@ function foursquareAPIwrapper (gMapMarker) {
         '&ll=' + lat + ',' + lng +
         '&intent=checkin' +
         '&limit=4';
-  $.ajax({
-    url: url,
-    success: function (result) {
-        var venues = result.response.venues;
-        var matchingVenue = {};
-        for (var i = 0; i < venues.length; i=i+1) {
-            if (venues[i].name === title) {
-                matchingVenue = venues[i];
-                break;
+    $.ajax({
+        url: url,
+        success: function (result) {
+            var venues = result.response.venues;
+            var matchingVenue = {};
+            for (var i = 0; i < venues.length; i=i+1) {
+                if (venues[i].name === title) {
+                   matchingVenue = venues[i];
+                    break;
+                }
             }
+            masterVM.mapVM.setVenue(matchingVenue);
+            gInfoWindow.setContent($('#star-marker-desc').html());
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Difficulty contacting foursquare! " + errorThrown);
         }
-      masterVM.mapVM.setVenue(matchingVenue);
-   },
-   error: function (XMLHttpRequest, textStatus, errorThrown) {
-       alert("Difficulty contacting foursquare! " + errorThrown);
-   }
-  });
+    });
 }
 
 // KnockoutJS view model for the search/filter string box
@@ -80,12 +81,12 @@ var FilterVM = function () {
 
     // Boolean function to indicate if search string in present in function parameter
     self.filterTextPresent = function (baseStr) {
-      return ko.computed({
-        read: function () {
-          // ignore case in looking for search string
-          return baseStr.toLowerCase().indexOf(self.filterText().toLowerCase()) >= 0;
-        }
-      });
+        return ko.computed({
+            read: function () {
+            // ignore case in looking for search string
+            return baseStr.toLowerCase().indexOf(self.filterText().toLowerCase()) >= 0;
+            }
+        });
     };
 };
 
@@ -96,6 +97,7 @@ var MapViewModel = function () {
     var self = this ;
 
     self.lastStarMarker = false ;
+    self.lastStarInfoWindow = false ;
 
 
     // uses KnockoutFire inteface between KnockoutJS and Firebase
@@ -123,16 +125,22 @@ var MapViewModel = function () {
     self.venueCategory = ko.observable("");
 
     // define closure to call foursquare map API for a marker
-    self.markerClickFunc = function (marker) {
+    self.markerClickFunc = function (marker, infoWindow) {
         return function () {
-            foursquareAPIwrapper(marker);
+            foursquareAPIwrapper(marker, infoWindow);
             if (self.lastStarMarker) {
                 self.lastStarMarker.setIcon(PIN_ICON);
                 self.lastStarMarker.setZIndex(0);
             }
+            if (self.lastStarInfoWindow) {
+                self.lastStarInfoWindow.setZIndex(0);
+            }
             marker.setIcon(STAR_ICON);
             marker.setZIndex(1);
+            infoWindow.setZIndex(1);
+            infoWindow.open(map, marker);
             self.lastStarMarker = marker;
+            self.lastStarInfoWindow= infoWindow;
         };
     };
 
@@ -178,25 +186,33 @@ ko.bindingHandlers.map = {
             title: allBindings().markerConfig.title,
             zIndex: 0
         });
+        var infoWindow = new google.maps.InfoWindow({ content: '...' });
         bindingContext.$data._mapMarker = marker;
-        bindingContext.$data._markerClickFn = masterVM.mapVM.markerClickFunc(marker);
+        bindingContext.$data._infoWindow = infoWindow;
+        bindingContext.$data._markerClickFn = masterVM.mapVM.markerClickFunc(marker, infoWindow);
         google.maps.event.addListener(marker, 'click', bindingContext.$data._markerClickFn);
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
         'use strict';
-        var mapMarker = bindingContext.$data._mapMarker ;
+        var mapMarker = bindingContext.$data._mapMarker;
+        var infoWindow = bindingContext.$data._infoWindow;
         // change in backend db (title, position) could have triggered update
         mapMarker.setTitle(allBindings().markerConfig.title);
         mapMarker.setPosition(allBindings().markerConfig.position);
         // search filter triggered update
-        mapMarker.setVisible(allBindings().visible());
+        var isVisible= allBindings().visible();
+        mapMarker.setVisible(isVisible);
+        // when marker gets hidden, close associated infowindow
+        if (!isVisible) {
+            infoWindow.close();
+        }
     }
 };
 
 // master VM to encapsulate sub view modules
 masterVM = {
-  filterVM : new FilterVM(),
-  mapVM: new MapViewModel()
+    filterVM : new FilterVM(),
+    mapVM: new MapViewModel()
 };
 
 // init function for KnockoutJS binding

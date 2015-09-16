@@ -8,7 +8,7 @@ http://mark70117.github.io/P5-1--NeighborhoodMapProject/
 ## Map View
 
 The map view is populated with various options for food, beverage, or entertainment
-which are a short walk from my home.    
+which are a short walk from my home.
 
 On a desktop computer with the view taking the full screen, the map appears on the right side of the screen.
 
@@ -17,9 +17,9 @@ On a mobile phone, the map appears at the very bottom of the screen.
 Between those two extremes, the app responds to the viewport dimensions and renders either a side by side
 view with map on right, or a top to bottom single column view with the map on the bottom.
 
-The map markers are clickable.  When you click on a marker, it changes style from 
-the default pin to a start.   As description of the venue, as retieved from Foursquare
-is displayed. 
+The map markers are clickable.  When you click on a marker, it changes style from
+the default pin to a start.   As description of the venue, as retrieved from Foursquare
+is displayed.
 
 ## Star Marker Description
 
@@ -27,14 +27,26 @@ The selected marker is designed by a star.  Foursquare is contacted to get furth
 the venue.  The details and quantity of that further information depend on the results from the
 Foursquare API, but can include: a category, street address, URL, and phone number.
 
+## Info Window
+
+The information from the Star Marker Description is also presented in a google maps infowindow
+when a marker is clicked.
+
+Of the two schools of thought, the allow multiple infowindows to be visible at the same time was
+chosen.  The info window corresponding to the current Star Marker will be atop any other open
+infowindows.
+
+If during a search, a marker becomes hidden, any open infowindow it had, will also be closed.
+This prevents info window from appearing on screen without a obviously associated marker.
+
 ## List View
 
-The List View is a list of all the markers listed by venue name.  Clicking on a venue name in the 
+The List View is a list of all the markers listed by venue name.  Clicking on a venue name in the
 list view results in a similar response to clicking on a marker.
 
 ## Search Box
 
-There are sort may places nearby is is hard to see the forest from the trees.  The Search box can 
+There are sort may places nearby is is hard to see the forest from the trees.  The Search box can
 be used to search for a venue name.  As each character is typed, the marker and list of venues is
 filters to show only those with the typed search string as part of their name.
 
