@@ -32,12 +32,13 @@ var MAP_HOME_LNG = -90.056589;
 /*
   GLOBALS
 */
-var map;
+var map;  // singleton google map
+var infowindow;  // singleton google map infowindow
 var firebase = new Firebase(FIREBASE_DB_URL);
 var masterVM;
 
 // Helper function to wrap call to Foursquare API
-function foursquareAPIwrapper (gMapMarker, gInfoWindow) {
+function foursquareAPIwrapper (gMapMarker) {
     'use strict';
     var title = gMapMarker.getTitle();
     var position = gMapMarker.getPosition();
@@ -58,7 +59,7 @@ function foursquareAPIwrapper (gMapMarker, gInfoWindow) {
             var venues = result.response.venues;
             if (venues.length > 0) {
                 var matchingVenue = venues[0];
-                masterVM.mapVM.setVenue(matchingVenue, gInfoWindow);
+                masterVM.mapVM.setVenue(matchingVenue);
             } else {
                 alert("Difficulty matching venue on foursquare!");
             }
@@ -94,8 +95,9 @@ var MapViewModel = function () {
 
     var self = this ;
 
-    self.lastStarMarker = false ;
-    self.lastStarInfoWindow = false ;
+    // keep track of last marker context to be able to close infowindow if
+    // marker changes from visible to hidden
+    self.lastStarContext = false ;
 
     // uses KnockoutFire inteface between KnockoutJS and Firebase
     self.markers =  KnockoutFire.observable(
@@ -121,23 +123,28 @@ var MapViewModel = function () {
     self.venuePhone = ko.observable("");
     self.venueCategory = ko.observable("");
 
-    // define closure to call foursquare map API for a marker
-    self.markerClickFunc = function (marker, infoWindow) {
+    // define closure to call foursquare map API for a marker in context
+    self.markerClickFunc = function (dataContext) {
         return function () {
-            foursquareAPIwrapper(marker, infoWindow);
-            if (self.lastStarMarker) {
-                self.lastStarMarker.setIcon(PIN_ICON);
-                self.lastStarMarker.setZIndex(0);
+            var marker = dataContext._mapMarker;
+            foursquareAPIwrapper(marker);
+            // if different marker clicked from last time
+            if (self.lastStarContext && (dataContext !== self.lastStarContext)) { // if different binding context
+		// last marker to give up possession of infoWindo
+                self.lastStarContext._possessInfoWindow = false ;
+                infowindow.close();
+		// undo promotion to star marker
+                var lastStarMarker = self.lastStarContext._mapMarker ;
+                lastStarMarker.setIcon(PIN_ICON);
+                lastStarMarker.setZIndex(0);
             }
-            if (self.lastStarInfoWindow) {
-                self.lastStarInfoWindow.setZIndex(0);
-            }
+            dataContext._possessInfoWindow = true;
+            // promote marker to star marker
             marker.setIcon(STAR_ICON);
             marker.setZIndex(1);
-            infoWindow.setZIndex(1);
-            infoWindow.open(map, marker);
-            self.lastStarMarker = marker;
-            self.lastStarInfoWindow= infoWindow;
+            infowindow.setContent('...'); // content will be filled in with async ajax success call to self.setVenue
+            infowindow.open(map, marker);
+            self.lastStarContext = dataContext;
         };
     };
 
@@ -152,7 +159,7 @@ var MapViewModel = function () {
 
     // convert return result from foursquare to KO obseravables
     //  update google maps infowindow with updated venue content
-    self.setVenue = function (foursquareVenue, gInfoWindow) {
+    self.setVenue = function (foursquareVenue) {
         self.venueName(foursquareVenue.name);
         self.venueURL(foursquareVenue.url ? foursquareVenue.url : "" );
         if (foursquareVenue.location) {
@@ -170,7 +177,7 @@ var MapViewModel = function () {
         } else {
             self.venueCategory("");
         }
-        gInfoWindow.setContent($('#star-marker-desc').html());
+        infowindow.setContent($('#star-marker-desc').html());
 
     };
 };
@@ -186,16 +193,15 @@ ko.bindingHandlers.map = {
             title: allBindings().markerConfig.title,
             zIndex: 0
         });
-        var infoWindow = new google.maps.InfoWindow({ content: '...' });
         bindingContext.$data._mapMarker = marker;
-        bindingContext.$data._infoWindow = infoWindow;
-        bindingContext.$data._markerClickFn = masterVM.mapVM.markerClickFunc(marker, infoWindow);
+        bindingContext.$data._possessInfoWindow = false;
+        bindingContext.$data._markerClickFn = masterVM.mapVM.markerClickFunc(bindingContext.$data);
         google.maps.event.addListener(marker, 'click', bindingContext.$data._markerClickFn);
     },
     update: function (element, valueAccessor, allBindings, deprecatedVM, bindingContext) {
         'use strict';
         var mapMarker = bindingContext.$data._mapMarker;
-        var infoWindow = bindingContext.$data._infoWindow;
+        var possessInfoWindow = bindingContext.$data._possessInfoWindow;
         // change in backend db (title, position) could have triggered update
         mapMarker.setTitle(allBindings().markerConfig.title);
         mapMarker.setPosition(allBindings().markerConfig.position);
@@ -203,8 +209,9 @@ ko.bindingHandlers.map = {
         var isVisible= allBindings().visible();
         mapMarker.setVisible(isVisible);
         // when marker gets hidden, close associated infowindow
-        if (!isVisible) {
-            infoWindow.close();
+        if (!isVisible && possessInfoWindow) {
+            bindingContext.$data._possessInfoWindow = false;
+            infowindow.close();
         }
     }
 };
@@ -233,6 +240,7 @@ function initializeMap() {
         document.getElementById('map-canvas'),
         mapOptions
     );
+    infowindow = new google.maps.InfoWindow({ content: '...' });
 }
 
 // initialize view models and map when DOM is ready
