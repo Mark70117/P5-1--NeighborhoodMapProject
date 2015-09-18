@@ -32,12 +32,11 @@ Foursquare API, but can include: a category, street address, URL, and phone numb
 The information from the Star Marker Description is also presented in a google maps infowindow
 when a marker is clicked.
 
-Of the two schools of thought, the allow multiple infowindows to be visible at the same time was
-chosen.  The info window corresponding to the current Star Marker will be atop any other open
-infowindows.
+Despite strenuous and numerous user complaints, client insists that a singleton infowindow be used.
+"We are the Google. Your culture will adapt to service us. Resistance is futile."
 
-If during a search, a marker becomes hidden, any open infowindow it had, will also be closed.
-This prevents info window from appearing on screen without a obviously associated marker.
+If during a search, a marker becomes hidden, the open infowindow if associated with a hidden marker, 
+will also be closed.  This prevents infowindow from appearing on screen without a obviously associated marker.
 
 ## List View
 
